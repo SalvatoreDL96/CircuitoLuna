@@ -534,16 +534,39 @@ document.querySelectorAll(".stepper button[data-k]").forEach(b=>b.onclick=()=>{
 // 1..10, then 0 = "Tutte" (whole path)
 $("vis-plus").onclick=()=>{ if(settings.visible && settings.visible<10) settings.visible++; else if(settings.visible===10) settings.visible=0; renderSettings(); liveEdit(); };
 $("vis-minus").onclick=()=>{ if(settings.visible===0) settings.visible=10; else if(settings.visible>1) settings.visible--; renderSettings(); liveEdit(); };
-$("beepbtn").onclick=()=>{ settings.beep=!settings.beep; renderSettings(); };
+$("beepbtn").onclick=()=>{ settings.beep=!settings.beep; renderSettings(); if(settings.beep){ unlockAudio(); setTimeout(()=>beep(660,.25),60); } };
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{ settings.mode=b.dataset.mode; renderSettings(); });
 
+// iPhone mutes web sounds when the side switch is on silent. Playing a tiny silent track in a loop
+// (and asking for the "playback" audio session where supported) makes the beeps play anyway.
+let silentEl=null;
+function unlockAudio(){
+  try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){}
+  try{
+    audio = audio || new (window.AudioContext||window.webkitAudioContext)();
+    if(audio.state!=="running") audio.resume();
+    // a near-silent blip right away "wakes up" the speaker on iOS
+    const o=audio.createOscillator(), g=audio.createGain(); g.gain.value=0.0001;
+    o.connect(g); g.connect(audio.destination); o.start(); o.stop(audio.currentTime+0.05);
+  }catch(e){}
+  try{
+    if(!silentEl){
+      silentEl=new Audio("data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==");
+      silentEl.loop=true; silentEl.setAttribute("playsinline",""); silentEl.volume=0.01;
+    }
+    const pr=silentEl.play(); if(pr && pr.catch) pr.catch(()=>{});
+  }catch(e){}
+}
+function stopSilent(){ try{ if(silentEl) silentEl.pause(); }catch(e){} }
 function beep(f,d){
   if(!settings.beep || !audio) return;
   try{
-    const o=audio.createOscillator(), g=audio.createGain();
-    o.frequency.value=f; o.connect(g); g.connect(audio.destination);
-    g.gain.setValueAtTime(.25,audio.currentTime); g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);
-    o.start(); o.stop(audio.currentTime+d);
+    if(audio.state!=="running") audio.resume();
+    const t=audio.currentTime, o=audio.createOscillator(), g=audio.createGain();
+    o.type="square"; o.frequency.value=f; o.connect(g); g.connect(audio.destination);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.5,t+0.01);
+    g.gain.setValueAtTime(0.5,t+d*0.6); g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.start(t); o.stop(t+d+0.02);
   }catch(e){}
 }
 
@@ -559,7 +582,7 @@ function showStep(i){
   $("n-kind").textContent=TYPES[s.t].name; $("n-kind").style.color=TYPES[s.t].color;
   $("n-count").textContent="Presa "+(i+1)+" di "+steps.length;
   $("back").disabled = i===0;
-  beep(s.t==="T"?990:660, .18);
+  beep(s.t==="T"?990:660, .3);
 }
 function finish(){
   run.phase="done";
@@ -574,7 +597,7 @@ function tick(){
   run.elapsed+=dt;
   if(run.phase==="countdown"){
     const left=Math.ceil(settings.countdown-run.elapsed);
-    if(left!==run.shown){ run.shown=left; $("cd").textContent=left; if(left>0) beep(520,.1); }
+    if(left!==run.shown){ run.shown=left; $("cd").textContent=left; if(left>0) beep(520,.15); }
     if(run.elapsed>=settings.countdown){ run.phase="climb"; $("cd").hidden=true; $("live").hidden=false; showStep(0); }
     return;
   }
@@ -594,7 +617,7 @@ async function keepAwake(on){
 function startRun(){
   const c=circuits.find(x=>x.id===$("pick").value);
   if(!c) return toast("Crea e salva prima un circuito");
-  try{ audio = audio || new (window.AudioContext||window.webkitAudioContext)(); audio.resume(); }catch(e){}
+  unlockAudio();
   run={c, mode:settings.mode, i:0, elapsed:0, last:performance.now(), paused:false, phase:"climb", shown:null};
   $("setup").hidden=true; $("running").hidden=false;
   $("restart").hidden=true; $("pause").hidden = run.mode!=="solo"; $("pause").textContent="Pausa";
@@ -607,7 +630,7 @@ function startRun(){
   clearInterval(tickT); tickT=setInterval(tick,100);
 }
 function stopRun(){
-  clearInterval(tickT); run=null; lightsOff(); keepAwake(false);
+  clearInterval(tickT); run=null; lightsOff(); keepAwake(false); stopSilent();
   paint(liveCells, [], true);
   $("running").hidden=true; $("setup").hidden=false;
 }
