@@ -458,7 +458,7 @@ async function connect(){
     const pr = rxChar.properties || {};
     noResponse = !!pr.writeWithoutResponse && !pr.write;
     setChip("on");
-    toast((noResponse ? "Arduino Nano" : "ESP32")+" collegata 💡");
+    toast((pr.write||pr.writeWithoutResponse) ? (noResponse ? "Arduino Nano" : "ESP32")+" collegata 💡" : "Moonboard collegata 💡");
     refreshWall();
   }catch(e){
     setChip("off");
@@ -475,20 +475,32 @@ function send(msg){
     while(pending!==null){
       const m = pending; pending = null;
       try{
-        for(let i=0;i<m.length;i+=20){
-          const part = enc.encode(m.slice(i,i+20));
-          if(noResponse){
-            if(rxChar.writeValueWithoutResponse) await rxChar.writeValueWithoutResponse(part);
-            else await rxChar.writeValue(part);
-            await new Promise(r=>setTimeout(r,15));   // small gap so the Arduino's 256-byte buffer never overflows
-          }
-          else if(rxChar.writeValueWithResponse) await rxChar.writeValueWithResponse(part);
-          else await rxChar.writeValue(part);
-        }
-      }catch(e){ toast("Invio non riuscito"); }
+        for(let i=0;i<m.length;i+=20) await writePart(enc.encode(m.slice(i,i+20)));
+      }catch(e){
+        toast("Invio non riuscito: "+((e && (e.message||e.name)) || "errore sconosciuto"));
+      }
     }
     writing = false;
   })();
+}
+// Write one 20-byte piece. If the chosen write type is refused (some browsers report the
+// characteristic properties wrongly), switch to the other type once and remember it.
+async function writeOnce(part, nr){
+  if(nr){
+    if(rxChar.writeValueWithoutResponse) await rxChar.writeValueWithoutResponse(part);
+    else await rxChar.writeValue(part);
+    await new Promise(r=>setTimeout(r,15));   // small gap so the Arduino's 256-byte buffer never overflows
+  }
+  else if(rxChar.writeValueWithResponse) await rxChar.writeValueWithResponse(part);
+  else await rxChar.writeValue(part);
+}
+async function writePart(part){
+  try{ await writeOnce(part, noResponse); }
+  catch(e1){
+    if(!rxChar) throw e1;
+    try{ await writeOnce(part, !noResponse); noResponse=!noResponse; }
+    catch(e2){ throw e1; }
+  }
 }
 // "l##" (a problem with no holds) turns all LEDs off on both firmwares; "~Z*" works only on the ESP32.
 const OFF_MSG = "l##";
