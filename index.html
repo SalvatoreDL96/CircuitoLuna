@@ -38,6 +38,7 @@
   --wood:#B99A66; --wood-dark:#9C7E4E; --hole:#3A2C18; --accent:#EEF1F6; --on-accent:#141A26;
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
 button,input,select{font:inherit;color:inherit}
@@ -119,7 +120,7 @@ input[type=text],select{width:100%;padding:11px 12px;border:1px solid var(--line
 .next{width:100%;padding:26px 10px;font-family:var(--display);font-size:30px;font-weight:700;border-radius:14px;border:0;background:var(--accent);color:var(--on-accent);margin-top:12px}
 .countdown{font-family:var(--display);font-size:120px;font-weight:700;text-align:center;line-height:1;padding:30px 0}
 
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
 nav button{border:0;background:none;padding:12px 4px 10px;font-weight:600;font-size:15px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button span{font-size:20px}
 nav button[aria-current="page"]{color:var(--ink)}
@@ -133,6 +134,31 @@ nav button[aria-current="page"]{color:var(--ink)}
 .lockerr{color:var(--red);font-weight:600;font-size:14px;margin:-4px 0 10px}
 .shake{animation:shake .35s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.badge{font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:8px;vertical-align:3px}
+.big2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.big2 button{padding:22px 8px;font-family:var(--display);font-size:26px;font-weight:700;border-radius:14px;border:0;color:#fff}
+.big2 .ok{background:var(--green)}.big2 .ko{background:var(--red)}
+.big2 button:disabled,.next:disabled{opacity:.4}
+.players{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.pchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:6px}
+.pchip.cur{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.pchip.out{opacity:.45;text-decoration:line-through}
+.pchip small{font-weight:500;font-size:13px}
+.pchip .x{border:0;background:none;padding:0 0 0 4px;font-size:18px;line-height:1;color:var(--muted)}
+.addrow{display:flex;gap:8px;margin-bottom:12px}
+.addrow input{flex:1}
+.status{font-family:var(--display);font-size:28px;font-weight:700;line-height:1.1;margin:2px 0 4px}
+.instr{color:var(--muted);font-size:15px;margin:0 0 10px}
+.slots{display:grid;gap:8px;margin-bottom:12px}
+.slot{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px}
+.slot b{font-family:var(--display);font-size:22px;text-align:center}
+.restbox{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 10px 14px;margin-bottom:10px}
+.restbox .countdown{font-size:88px;padding:6px 0 0}
+.restbox p{margin:0;color:var(--muted)}
+table.sum{width:100%;border-collapse:collapse;margin-top:12px;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+table.sum th,table.sum td{padding:9px 6px;text-align:center;border-bottom:1px solid var(--line);font-size:15px}
+table.sum th:first-child,table.sum td:first-child{text-align:left;padding-left:12px}
+table.sum .y{color:var(--green);font-weight:700}table.sum .n{color:var(--red);font-weight:700}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--accent);color:var(--on-accent);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%;text-align:center}
 .toast.show{opacity:1}
 .sheet{position:fixed;inset:0;background:rgba(10,14,22,.55);display:none;align-items:flex-end;justify-content:center;z-index:10}
@@ -152,9 +178,13 @@ nav button[aria-current="page"]{color:var(--ink)}
 <main>
   <!-- CREA -->
   <section class="view active" id="view-crea">
+    <div class="seg" id="kind-seg" role="group" aria-label="Tipo">
+      <button type="button" data-kind="circuito" aria-pressed="true">Circuito</button>
+      <button type="button" data-kind="blocco" aria-pressed="false">Blocco</button>
+    </div>
     <div class="namerow">
       <div class="field">
-        <label for="cname">Nome del circuito <span style="color:var(--red)">*</span></label>
+        <label for="cname">Nome <span style="color:var(--red)">*</span></label>
         <input type="text" id="cname" placeholder="Es. Resistenza del martedì" maxlength="40">
       </div>
       <div class="field">
@@ -170,13 +200,13 @@ nav button[aria-current="page"]{color:var(--ink)}
       <button class="btn" id="preview" type="button">Accendi tutte</button>
     </div>
     <div class="row">
-      <button class="btn primary grow" id="save" type="button">Salva circuito</button>
+      <button class="btn primary grow" id="save" type="button">Salva</button>
     </div>
   </section>
 
   <!-- CIRCUITI -->
   <section class="view" id="view-lista">
-    <h2>I tuoi circuiti</h2>
+    <h2>I tuoi percorsi</h2>
     <div class="list" id="list"></div>
   </section>
 
@@ -188,7 +218,7 @@ nav button[aria-current="page"]{color:var(--ink)}
         <label for="pick">Circuito</label>
         <select id="pick"></select>
       </div>
-      <div class="seg" role="group" aria-label="Modalità">
+      <div class="seg" id="mode-seg" role="group" aria-label="Modalità">
         <button type="button" data-mode="solo" aria-pressed="true">Da solo</button>
         <button type="button" data-mode="duo" aria-pressed="false">In due</button>
       </div>
@@ -222,12 +252,84 @@ nav button[aria-current="page"]{color:var(--ink)}
       </div>
     </div>
   </section>
+
+  <!-- GIOCHI -->
+  <section class="view" id="view-giochi">
+    <div class="seg" id="game-seg" role="group" aria-label="Gioco">
+      <button type="button" data-g="x4" aria-pressed="true">4x4</button>
+      <button type="button" data-g="pp" aria-pressed="false">Gioco 2+2</button>
+    </div>
+
+    <!-- 4x4 setup -->
+    <div id="x4-setup">
+      <p class="instr">Scegli 4 blocchi: li sali uno dopo l'altro scendendo tra un blocco e l'altro, poi riposi. Si ripete per 4 giri.</p>
+      <div class="slots" id="x4-slots"></div>
+      <div class="seg" id="x4-order" role="group" aria-label="Ordine">
+        <button type="button" data-o="row" aria-pressed="true">Uno dopo l'altro</button>
+        <button type="button" data-o="same" aria-pressed="false">4 volte lo stesso</button>
+      </div>
+      <div class="stepper"><span>Riposo tra i giri</span><div class="ctrl"><button type="button" id="x4rest-m">−</button><output id="o-x4rest"></output><button type="button" id="x4rest-p">+</button></div></div>
+      <div class="stepper"><span>Pausa tra un blocco e l'altro</span><div class="ctrl"><button type="button" id="x4gap-m">−</button><output id="o-x4gap"></output><button type="button" id="x4gap-p">+</button></div></div>
+      <button class="btn primary" id="x4-start" type="button" style="width:100%;padding:16px">Inizia il 4x4</button>
+    </div>
+
+    <!-- 4x4 running -->
+    <div id="x4-run" hidden>
+      <div class="now">
+        <div><div class="status" id="x4-title"></div><div class="instr" id="x4-sub" style="margin:0"></div></div>
+        <div class="count" id="x4-count"></div>
+      </div>
+      <div class="restbox" id="x4-rest" hidden>
+        <div class="countdown" id="x4-cd"></div>
+        <p id="x4-restlbl"></p>
+      </div>
+      <div class="board" id="board-x4"></div>
+      <div class="big2" id="x4-btns">
+        <button type="button" class="ok" id="x4-ok">Fatto ✔</button>
+        <button type="button" class="ko" id="x4-ko">Caduto ✗</button>
+      </div>
+      <div id="x4-summary"></div>
+      <div class="row">
+        <button class="btn grow" id="x4-skip" type="button" hidden>Salta il riposo</button>
+        <button class="btn primary grow" id="x4-again" type="button" hidden>Nuovo 4x4</button>
+        <button class="btn grow danger" id="x4-stop" type="button">Stop</button>
+      </div>
+    </div>
+
+    <!-- 2+2 setup -->
+    <div id="pp-setup" hidden>
+      <p class="instr">Chi parte sceglie lo start e aggiunge le sue prese, accoppiando l'ultima. Chi va dopo ripete tutto il percorso e aggiunge le sue. Chi è giù segna le prese sull'app.</p>
+      <div class="field"><label>Giocatori</label></div>
+      <div class="players" id="pp-players"></div>
+      <div class="addrow">
+        <input type="text" id="pp-name" placeholder="Nome giocatore" maxlength="16">
+        <button class="btn" id="pp-add" type="button">Aggiungi</button>
+      </div>
+      <div class="stepper"><span>Prese a turno</span><div class="ctrl"><button type="button" id="ppper-m">−</button><output id="o-ppper"></output><button type="button" id="ppper-p">+</button></div></div>
+      <div class="stepper"><span>Vite per giocatore</span><div class="ctrl"><button type="button" id="pplives-m">−</button><output id="o-pplives"></output><button type="button" id="pplives-p">+</button></div></div>
+      <button class="btn primary" id="pp-start" type="button" style="width:100%;padding:16px">Inizia la partita</button>
+    </div>
+
+    <!-- 2+2 running -->
+    <div id="pp-run" hidden>
+      <div class="status" id="pp-status"></div>
+      <p class="instr" id="pp-instr"></p>
+      <div class="players" id="pp-score"></div>
+      <div class="board" id="board-pp"></div>
+      <div id="pp-actions"></div>
+      <div class="row">
+        <button class="btn grow" id="pp-undo" type="button">↩︎ Annulla</button>
+        <button class="btn grow danger" id="pp-end" type="button">Fine partita</button>
+      </div>
+    </div>
+  </section>
 </main>
 
 <nav>
   <button type="button" data-view="crea" aria-current="page"><span>✏️</span>Crea</button>
-  <button type="button" data-view="lista"><span>📋</span>Circuiti</button>
+  <button type="button" data-view="lista"><span>📋</span>Salvati</button>
   <button type="button" data-view="allena"><span>🧗</span>Allenati</button>
+  <button type="button" data-view="giochi"><span>🎲</span>Giochi</button>
 </nav>
 
 <div class="lock" id="lock" hidden>
@@ -304,8 +406,20 @@ const TYPES = {
   // old circuits saved before the new tap system
   R:{code:"S", name:"Destra",   color:"var(--green)"},
   L:{code:"P", name:"Sinistra", color:"var(--blue)"},
-  M:{code:"M", name:"Accoppia", color:"var(--yellow)", dark:true}
+  M:{code:"M", name:"Accoppia", color:"var(--yellow)", dark:true},
+  // single boulder problems and the 2+2 game
+  B:{code:"P", name:"Presa",    color:"var(--blue)"}
 };
+// Boulder editor: tapping a hold cycles Presa (blue) -> Start (green) -> Top (red) -> removed
+const NEXT_BLOCCO = {B:"S", S:"T", T:null};
+// What the wall and the grid show for a saved path: a boulder shows all holds (S/T letters), a circuit shows its order
+function pathItems(c){
+  if(c.kind==="blocco") return c.steps.map(s=>({h:s.h, t:s.t, label:s.t==="S"?"S":s.t==="T"?"T":""}));
+  const last={}; c.steps.forEach((s,n)=> last[s.h]={h:s.h, t:s.t, label:String(n+1)});
+  return Object.values(last);
+}
+const fmt = sec => { sec=Math.max(0,Math.ceil(sec)); return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0"); };
+let activeGame = null;   // "x4" | "pp" while a game is running
 // Tapping the last hold again: Destra -> Sinistra -> Top -> removed. Start -> removed.
 const NEXT = {D:"N", N:"T", T:null, S:null};
 // LED index: A1=0 up to A18=17, then B18=18 down to B1=35, and so on (serpentine)
@@ -316,6 +430,10 @@ const coordOf = i => { const c=Math.floor(i/ROWS), p=i%ROWS; return COLS[c]+(c%2
 const SVC = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 const RX  = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 let device=null, rxChar=null, pending=null, writing=false;
+// The ESP32 firmware (BLESerial) accepts only "write with response"; the Arduino Nano 33 BLE firmware
+// (ArduinoMoonBoardLED / HardwareBLESerial) accepts only "write without response". We pick the right one
+// from the characteristic's properties after connecting.
+let noResponse=false;
 const enc = new TextEncoder();
 const chip = document.getElementById("conn");
 
@@ -337,7 +455,11 @@ async function connect(){
     const server = await device.gatt.connect();
     const svc = await server.getPrimaryService(SVC);
     rxChar = await svc.getCharacteristic(RX);
-    setChip("on"); toast("Moonboard collegata 💡"); liveEdit();
+    const pr = rxChar.properties || {};
+    noResponse = !!pr.writeWithoutResponse && !pr.write;
+    setChip("on");
+    toast((noResponse ? "Arduino Nano" : "ESP32")+" collegata 💡");
+    refreshWall();
   }catch(e){
     setChip("off");
     if(e && e.name!=="NotFoundError") toast("Collegamento non riuscito: riprova vicino alla parete");
@@ -355,7 +477,12 @@ function send(msg){
       try{
         for(let i=0;i<m.length;i+=20){
           const part = enc.encode(m.slice(i,i+20));
-          if(rxChar.writeValueWithResponse) await rxChar.writeValueWithResponse(part);
+          if(noResponse){
+            if(rxChar.writeValueWithoutResponse) await rxChar.writeValueWithoutResponse(part);
+            else await rxChar.writeValue(part);
+            await new Promise(r=>setTimeout(r,15));   // small gap so the Arduino's 256-byte buffer never overflows
+          }
+          else if(rxChar.writeValueWithResponse) await rxChar.writeValueWithResponse(part);
           else await rxChar.writeValue(part);
         }
       }catch(e){ toast("Invio non riuscito"); }
@@ -363,8 +490,10 @@ function send(msg){
     writing = false;
   })();
 }
-const sendHolds = steps => steps.length ? send("l#"+steps.map(s=>TYPES[s.t].code+s.h).join(",")+"#") : send("~Z*");
-const lightsOff = () => send("~Z*");
+// "l##" (a problem with no holds) turns all LEDs off on both firmwares; "~Z*" works only on the ESP32.
+const OFF_MSG = "l##";
+const sendHolds = steps => steps.length ? send("l#"+steps.map(s=>TYPES[s.t].code+s.h).join(",")+"#") : send(OFF_MSG);
+const lightsOff = () => send(OFF_MSG);
 chip.addEventListener("click", connect);
 document.getElementById("helpclose").onclick = ()=>document.getElementById("help").classList.remove("show");
 setChip("off");
@@ -417,9 +546,26 @@ function paint(cells, items, lit){
 
 /* ---------- CREA ---------- */
 let editing = {id:null, steps:[]};
+let editKind = "circuito";
+function setKind(k, convert){
+  if(convert && k!==editKind){
+    if(k==="blocco"){ const seen=new Set(); editing.steps=editing.steps.filter(s=>!seen.has(s.h) && seen.add(s.h)).map(s=>({h:s.h, t:(s.t==="S"||s.t==="T")?s.t:"B"})); }
+    else editing.steps=editing.steps.map(s=>({h:s.h, t:s.t==="B"?"D":s.t}));
+  }
+  editKind=k;
+  document.querySelectorAll("#kind-seg button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.kind===k));
+  $("cname").placeholder = k==="blocco" ? "Es. Il traverso del mercoledì" : "Es. Resistenza del martedì";
+  renderEditor(); liveEdit();
+}
+document.querySelectorAll("#kind-seg button").forEach(b=>b.onclick=()=>setKind(b.dataset.kind, true));
 const editCells = buildBoard($("board-edit"), i=>{
   const st=editing.steps, last=st[st.length-1];
-  if(!st.length) st.push({h:i,t:"S"});                 // very first hold = start
+  if(editKind==="blocco"){
+    const k=st.findIndex(s=>s.h===i);
+    if(k<0) st.push({h:i,t:"B"});
+    else { const nx=NEXT_BLOCCO[st[k].t]; if(nx) st[k].t=nx; else st.splice(k,1); }
+  }
+  else if(!st.length) st.push({h:i,t:"S"});            // very first hold = start
   else if(last.h===i){                                  // same hold again: change colour
     const nx=NEXT[last.t];
     if(nx) last.t=nx; else st.pop();
@@ -430,11 +576,14 @@ const editCells = buildBoard($("board-edit"), i=>{
 });
 function renderEditor(){
   // a hold used more than once shows its latest number and role
-  const last = {};
-  editing.steps.forEach((s,n)=> last[s.h] = {h:s.h, t:s.t, label:String(n+1)});
-  paint(editCells, Object.values(last), false);
+  paint(editCells, pathItems({kind:editKind, steps:editing.steps}), false);
   const st=$("steps"); st.innerHTML="";
-  if(!editing.steps.length){ st.innerHTML='<div class="empty">Tocca la presa di partenza: diventa verde. Poi tocca le altre nell\'ordine in cui devono apparire.</div>'; return; }
+  if(!editing.steps.length){
+    st.innerHTML = editKind==="blocco"
+      ? '<div class="empty">Tocca una presa: diventa blu. Ritoccala: verde (partenza), poi rossa (top), poi si toglie.</div>'
+      : '<div class="empty">Tocca la presa di partenza: diventa verde. Poi tocca le altre nell\'ordine in cui devono apparire.</div>';
+    return;
+  }
   editing.steps.forEach((s,n)=>{
     const d=document.createElement("button"); d.type="button"; d.className="step"; d.title="Tocca per togliere";
     const i=document.createElement("i"); i.style.background=TYPES[s.t].color; i.textContent=n+1; if(TYPES[s.t].dark) i.style.color="#3A2C00";
@@ -447,9 +596,17 @@ function renderEditor(){
 }
 // While tracing, the wall shows the same holds you'd see at that point of the training
 function liveEdit(){
-  if(!rxChar || run) return;
+  if(!rxChar || run || activeGame) return;
   const st=editing.steps;
+  if(editKind==="blocco") return sendHolds(st);
   sendHolds(st.slice(st.length ? windowFrom(st.length-1) : 0));
+}
+// Re-send whatever should be on the wall right now (used after connecting)
+function refreshWall(){
+  if(activeGame==="x4") x4Wall();
+  else if(activeGame==="pp") ppWall();
+  else if(run) showStep(run.i);
+  else liveEdit();
 }
 $("undo").onclick=()=>{ editing.steps.pop(); renderEditor(); liveEdit(); };
 // Two-tap confirmation (pop-up dialogs are blocked inside the hosted page)
@@ -473,13 +630,15 @@ $("save").onclick=()=>{
   if(!name){
     const f=$("cname"); f.classList.add("missing"); f.focus();
     window.scrollTo({top:0,behavior:"smooth"});
-    return toast("Dai un nome al circuito prima di salvarlo");
+    return toast("Dai un nome prima di salvarlo");
   }
+  if(editKind==="blocco" && (!editing.steps.some(s=>s.t==="S") || !editing.steps.some(s=>s.t==="T")))
+    return toast("Segna almeno una partenza (verde) e un top (rosso)");
   if(editing.id){
     const c=circuits.find(x=>x.id===editing.id);
-    if(c){ c.name=name; c.grade=$("cgrade").value; c.steps=editing.steps.slice(); }
+    if(c){ c.name=name; c.grade=$("cgrade").value; c.kind=editKind; c.steps=editing.steps.slice(); }
   }else{
-    circuits.unshift({id:Date.now().toString(36), name, grade:$("cgrade").value, steps:editing.steps.slice()});
+    circuits.unshift({id:Date.now().toString(36), name, grade:$("cgrade").value, kind:editKind, steps:editing.steps.slice()});
   }
   store("mbc_circuits", circuits);
   toast("Salvato: "+name);
@@ -489,28 +648,32 @@ $("save").onclick=()=>{
 /* ---------- CIRCUITI ---------- */
 function renderList(){
   const L=$("list"); L.innerHTML="";
-  if(!circuits.length){ L.innerHTML='<p class="hint">Nessun circuito salvato. Crealo nella scheda Crea.</p>'; }
+  if(!circuits.length){ L.innerHTML='<p class="hint">Nessun percorso salvato. Crealo nella scheda Crea.</p>'; }
   circuits.forEach(c=>{
     const it=document.createElement("div"); it.className="item";
     const h=document.createElement("h3");
     if(c.grade){ const g=document.createElement("span"); g.className="grade"; g.textContent=c.grade; h.appendChild(g); }
     h.append(c.name);
-    const m=document.createElement("div"); m.className="meta"; m.textContent=c.steps.length+" prese";
+    const isB = c.kind==="blocco";
+    const m=document.createElement("div"); m.className="meta"; m.textContent=(isB?"Blocco":"Circuito")+" · "+c.steps.length+" prese";
     const dots=document.createElement("div"); dots.className="dots";
     c.steps.slice(0,40).forEach(s=>{ const i=document.createElement("i"); i.style.background=TYPES[s.t].color; dots.appendChild(i); });
     const row=document.createElement("div"); row.className="row";
-    const go=document.createElement("button"); go.className="btn primary grow"; go.type="button"; go.textContent="Allenati";
-    go.onclick=()=>{ $("pick").value=c.id; show("allena"); };
+    const go=document.createElement("button"); go.className="btn primary grow"; go.type="button"; go.textContent=isB?"Accendi":"Allenati";
+    go.onclick = isB
+      ? ()=>{ if(!rxChar) return toast("Collega la Moonboard per accenderlo sulla parete"); if(run||activeGame) return toast("Termina prima l'allenamento in corso"); sendHolds(c.steps); toast(c.name+" acceso sulla parete"); }
+      : ()=>{ $("pick").value=c.id; show("allena"); };
     const ed=document.createElement("button"); ed.className="btn"; ed.type="button"; ed.textContent="Modifica";
-    ed.onclick=()=>{ editing={id:c.id, steps:c.steps.map(s=>({...s}))}; $("cname").value=c.name; $("cgrade").value=c.grade||""; renderEditor(); show("crea"); };
+    ed.onclick=()=>{ editing={id:c.id, steps:c.steps.map(s=>({...s}))}; $("cname").value=c.name; $("cgrade").value=c.grade||""; setKind(c.kind||"circuito", false); show("crea"); };
     const del=document.createElement("button"); del.className="btn danger"; del.type="button"; del.textContent="Elimina";
     del.onclick=()=>confirmTap(del, ()=>{ circuits=circuits.filter(x=>x.id!==c.id); store("mbc_circuits",circuits); renderList(); toast("Circuito eliminato"); });
     row.append(go,ed,del);
     it.append(h,m,dots,row); L.appendChild(it);
   });
   const P=$("pick"), keep=P.value; P.innerHTML="";
-  circuits.forEach(c=>{ const o=document.createElement("option"); o.value=c.id; o.textContent=(c.grade?c.grade+" · ":"")+c.name+" ("+c.steps.length+" prese)"; P.appendChild(o); });
+  circuits.filter(c=>c.kind!=="blocco").forEach(c=>{ const o=document.createElement("option"); o.value=c.id; o.textContent=(c.grade?c.grade+" · ":"")+c.name+" ("+c.steps.length+" prese)"; P.appendChild(o); });
   if(keep && circuits.some(c=>c.id===keep)) P.value=keep;
+  if(typeof renderX4Setup==="function") renderX4Setup();
 }
 
 /* ---------- ALLENATI ---------- */
@@ -522,7 +685,7 @@ function renderSettings(){
   $("o-countdown").textContent=settings.countdown+" s";
   $("beepbtn").textContent=settings.beep?"Attivo":"Spento";
   $("o-visible").textContent=settings.visible?settings.visible:"Tutte";
-  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.mode===settings.mode));
+  document.querySelectorAll("#mode-seg button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.mode===settings.mode));
   $("solo-opts").hidden = settings.mode!=="solo";
   $("duo-hint").hidden = settings.mode!=="duo";
   store("mbc_settings", settings);
@@ -535,7 +698,7 @@ document.querySelectorAll(".stepper button[data-k]").forEach(b=>b.onclick=()=>{
 $("vis-plus").onclick=()=>{ if(settings.visible && settings.visible<10) settings.visible++; else if(settings.visible===10) settings.visible=0; renderSettings(); liveEdit(); };
 $("vis-minus").onclick=()=>{ if(settings.visible===0) settings.visible=10; else if(settings.visible>1) settings.visible--; renderSettings(); liveEdit(); };
 $("beepbtn").onclick=()=>{ settings.beep=!settings.beep; renderSettings(); if(settings.beep){ unlockAudio(); setTimeout(()=>beep(660,.25),60); } };
-document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{ settings.mode=b.dataset.mode; renderSettings(); });
+document.querySelectorAll("#mode-seg button").forEach(b=>b.onclick=()=>{ settings.mode=b.dataset.mode; renderSettings(); });
 
 // iPhone mutes web sounds when the side switch is on silent. Playing a tiny silent track in a loop
 // (and asking for the "playback" audio session where supported) makes the beeps play anyway.
@@ -617,6 +780,7 @@ async function keepAwake(on){
 function startRun(){
   const c=circuits.find(x=>x.id===$("pick").value);
   if(!c) return toast("Crea e salva prima un circuito");
+  if(activeGame) return toast("Termina prima il gioco in corso");
   unlockAudio();
   run={c, mode:settings.mode, i:0, elapsed:0, last:performance.now(), paused:false, phase:"climb", shown:null};
   $("setup").hidden=true; $("running").hidden=false;
@@ -649,6 +813,286 @@ $("nextbtn").onclick=()=>{
 };
 $("back").onclick=()=>{ if(run && run.i>0) showStep(run.i-1); };
 
+/* ---------- GIOCHI: 4x4 ---------- */
+settings.x4 = Object.assign({slots:["","","",""], order:"row", rest:180, gap:0}, settings.x4||{});
+settings.pp = Object.assign({players:["Salvatore","Giocatore 2"], lives:3, per:2}, settings.pp||{});
+const x4Cells = buildBoard($("board-x4"), null);
+let x4 = null, x4T = null;
+const byId = id => circuits.find(c=>c.id===id);
+const titleOf = c => (c.grade?c.grade+" · ":"")+c.name;
+
+function renderX4Setup(){
+  const box=$("x4-slots"); box.innerHTML="";
+  const list = circuits.slice().sort((a,b)=>(a.kind==="blocco"?0:1)-(b.kind==="blocco"?0:1));
+  for(let n=0;n<4;n++){
+    const row=document.createElement("div"); row.className="slot";
+    const num=document.createElement("b"); num.textContent=n+1;
+    const sel=document.createElement("select"); sel.setAttribute("aria-label","Blocco "+(n+1));
+    const o0=document.createElement("option"); o0.value=""; o0.textContent="Scegli un blocco…"; sel.appendChild(o0);
+    list.forEach(c=>{ const o=document.createElement("option"); o.value=c.id; o.textContent=titleOf(c)+(c.kind==="blocco"?"":" (circuito)"); sel.appendChild(o); });
+    sel.value = byId(settings.x4.slots[n]) ? settings.x4.slots[n] : "";
+    sel.onchange=()=>{ settings.x4.slots[n]=sel.value; store("mbc_settings",settings); };
+    row.append(num, sel); box.appendChild(row);
+  }
+  document.querySelectorAll("#x4-order button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.o===settings.x4.order));
+  $("o-x4rest").textContent = fmt(settings.x4.rest);
+  $("o-x4gap").textContent = settings.x4.gap+" s";
+  store("mbc_settings", settings);
+}
+document.querySelectorAll("#x4-order button").forEach(b=>b.onclick=()=>{ settings.x4.order=b.dataset.o; renderX4Setup(); });
+$("x4rest-m").onclick=()=>{ settings.x4.rest=Math.max(0,settings.x4.rest-15); renderX4Setup(); };
+$("x4rest-p").onclick=()=>{ settings.x4.rest=Math.min(900,settings.x4.rest+15); renderX4Setup(); };
+$("x4gap-m").onclick=()=>{ settings.x4.gap=Math.max(0,settings.x4.gap-5); renderX4Setup(); };
+$("x4gap-p").onclick=()=>{ settings.x4.gap=Math.min(120,settings.x4.gap+5); renderX4Setup(); };
+
+function x4Start(){
+  if(run) return toast("Termina prima l'allenamento in corso");
+  const ids=settings.x4.slots;
+  if(ids.some(id=>!byId(id))) return toast("Scegli tutti e 4 i blocchi");
+  const items=[];
+  if(settings.x4.order==="row"){ for(let r=0;r<4;r++) for(let b=0;b<4;b++) items.push({b,r,g:r}); }
+  else { for(let b=0;b<4;b++) for(let r=0;r<4;r++) items.push({b,r,g:b}); }
+  x4={ids:ids.slice(), items, i:0, phase:"climb", left:0, res:[], t0:performance.now(), last:performance.now(), beeped:null};
+  activeGame="x4"; unlockAudio(); keepAwake(true);
+  $("x4-setup").hidden=true; $("x4-run").hidden=false; $("game-seg").hidden=true;
+  $("x4-summary").innerHTML=""; $("x4-again").hidden=true; $("board-x4").hidden=false; $("x4-stop").hidden=false; $("x4-btns").hidden=false;
+  x4Show(0);
+  clearInterval(x4T); x4T=setInterval(x4Tick,200);
+}
+const x4Item = i => { const it=x4.items[i]; return {it, c:byId(x4.ids[it.b])}; };
+function x4Wall(){
+  if(!x4) return;
+  if(x4.phase==="done") return lightsOff();
+  const k = x4.phase==="climb" ? x4.i : x4.i+1;
+  const {c}=x4Item(k); if(c) sendHolds(c.steps);
+}
+function x4Header(i, prefix){
+  const {it,c}=x4Item(i);
+  $("x4-title").textContent=(prefix||"")+(c?titleOf(c):"Blocco eliminato");
+  $("x4-sub").textContent = settings.x4.order==="row"
+    ? "Giro "+(it.r+1)+" di 4 · Blocco "+(it.b+1)+" di 4"
+    : "Blocco "+(it.b+1)+" di 4 · Ripetizione "+(it.r+1)+" di 4";
+  if(c) paint(x4Cells, pathItems(c), true);
+}
+function x4Show(i){
+  x4.i=i; x4.phase="climb";
+  $("x4-rest").hidden=true; $("x4-skip").hidden=true; $("x4-btns").hidden=false;
+  x4Header(i); x4Wall(); x4Clock();
+  beep(660,.3);
+}
+function x4Mark(ok){
+  if(!x4 || x4.phase!=="climb") return;
+  x4.res[x4.i]=ok;
+  if(navigator.vibrate) navigator.vibrate(ok?15:[40,40,40]);
+  const nx=x4.i+1;
+  if(nx>=x4.items.length) return x4Done();
+  const newGroup = x4.items[nx].g!==x4.items[x4.i].g;
+  const dur = newGroup ? settings.x4.rest : settings.x4.gap;
+  if(dur<=0) return x4Show(nx);
+  x4.phase="rest"; x4.left=dur; x4.beeped=null; x4.last=performance.now();
+  $("x4-rest").hidden=false; $("x4-skip").hidden=false; $("x4-btns").hidden=true;
+  $("x4-restlbl").textContent=(newGroup?"Riposo":"Pausa")+" · sulla parete vedi il prossimo blocco";
+  $("x4-cd").textContent=fmt(dur);
+  x4Header(nx, "Prossimo: "); x4Wall();
+}
+function x4Tick(){
+  if(!x4) return;
+  const now=performance.now(), dt=(now-x4.last)/1000; x4.last=now;
+  x4Clock();
+  if(x4.phase!=="rest") return;
+  x4.left-=dt;
+  const s=Math.ceil(x4.left);
+  $("x4-cd").textContent=fmt(x4.left);
+  if(s<=3 && s>0 && x4.beeped!==s){ x4.beeped=s; beep(520,.15); }
+  if(x4.left<=0) x4Show(x4.i+1);
+}
+function x4Clock(){
+  if(!x4 || x4.phase==="done") return;
+  const done=x4.res.length;
+  $("x4-count").textContent="⏱ "+fmt((performance.now()-x4.t0)/1000)+"\n"+done+" di 16";
+  $("x4-count").style.whiteSpace="pre-line";
+}
+function x4Done(){
+  x4.phase="done"; clearInterval(x4T); lightsOff(); keepAwake(false); stopSilent(); activeGame=null;
+  const ok=x4.res.filter(Boolean).length, tot=fmt((performance.now()-x4.t0)/1000);
+  $("x4-title").textContent="4x4 completato 🎉";
+  $("x4-sub").textContent=ok+" blocchi su 16 senza cadere · tempo totale "+tot;
+  $("x4-count").textContent="";
+  $("x4-rest").hidden=true; $("x4-btns").hidden=true; $("x4-skip").hidden=true; $("x4-stop").hidden=true; $("x4-again").hidden=false;
+  paint(x4Cells, [], true); $("board-x4").hidden=true;
+  // summary table: one row per problem, one column per round
+  const t=document.createElement("table"); t.className="sum";
+  const hr=t.insertRow(); ["Blocco","1","2","3","4"].forEach(x=>{ const th=document.createElement("th"); th.textContent=x; hr.appendChild(th); });
+  for(let b=0;b<4;b++){
+    const r=t.insertRow(); const c=byId(x4.ids[b]);
+    r.insertCell().textContent=(b+1)+". "+(c?c.name:"—");
+    for(let k=0;k<4;k++){
+      const idx=x4.items.findIndex(it=>it.b===b && it.r===k);
+      const cell=r.insertCell(); const v=x4.res[idx];
+      cell.textContent = v ? "✔" : "✗"; cell.className = v ? "y" : "n";
+    }
+  }
+  $("x4-summary").innerHTML=""; $("x4-summary").appendChild(t);
+  beep(880,.15); setTimeout(()=>beep(1180,.3),180);
+}
+function x4Stop(){
+  clearInterval(x4T); x4=null; activeGame=null; lightsOff(); keepAwake(false); stopSilent();
+  paint(x4Cells, [], true);
+  $("x4-run").hidden=true; $("x4-setup").hidden=false; $("game-seg").hidden=false;
+}
+$("x4-start").onclick=x4Start;
+$("x4-ok").onclick=()=>x4Mark(true);
+$("x4-ko").onclick=()=>x4Mark(false);
+$("x4-skip").onclick=()=>{ if(x4 && x4.phase==="rest") x4Show(x4.i+1); };
+$("x4-stop").onclick=e=>confirmTap(e.currentTarget, x4Stop);
+$("x4-again").onclick=x4Stop;
+
+/* ---------- GIOCHI: 2+2 ---------- */
+const ppCells = buildBoard($("board-pp"), i=>ppTap(i));
+let pp = null;
+const livesTxt = n => n ? String(n) : "∞";
+function renderPPSetup(){
+  const box=$("pp-players"); box.innerHTML="";
+  settings.pp.players.forEach((n,k)=>{
+    const ch=document.createElement("span"); ch.className="pchip"; ch.append(n);
+    const x=document.createElement("button"); x.type="button"; x.className="x"; x.textContent="×"; x.setAttribute("aria-label","Togli "+n);
+    x.onclick=()=>{ settings.pp.players.splice(k,1); renderPPSetup(); };
+    ch.appendChild(x); box.appendChild(ch);
+  });
+  if(!settings.pp.players.length) box.innerHTML='<span class="instr">Aggiungi almeno un giocatore</span>';
+  $("o-ppper").textContent=settings.pp.per;
+  $("o-pplives").textContent=livesTxt(settings.pp.lives);
+  store("mbc_settings", settings);
+}
+function ppAddPlayer(){
+  const f=$("pp-name"), n=f.value.trim();
+  if(!n) return f.focus();
+  if(settings.pp.players.length>=8) return toast("Massimo 8 giocatori");
+  settings.pp.players.push(n); f.value=""; renderPPSetup();
+}
+$("pp-add").onclick=ppAddPlayer;
+$("pp-name").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); ppAddPlayer(); } });
+$("ppper-m").onclick=()=>{ settings.pp.per=Math.max(1,settings.pp.per-1); renderPPSetup(); };
+$("ppper-p").onclick=()=>{ settings.pp.per=Math.min(4,settings.pp.per+1); renderPPSetup(); };
+// lives: 1..5, then 0 = unlimited
+$("pplives-m").onclick=()=>{ settings.pp.lives = settings.pp.lives===0 ? 5 : Math.max(1,settings.pp.lives-1); renderPPSetup(); };
+$("pplives-p").onclick=()=>{ settings.pp.lives = settings.pp.lives===0 ? 0 : settings.pp.lives>=5 ? 0 : settings.pp.lives+1; renderPPSetup(); };
+
+function ppStart(){
+  if(run) return toast("Termina prima l'allenamento in corso");
+  if(!settings.pp.players.length) return toast("Aggiungi almeno un giocatore");
+  pp={players:settings.pp.players.map(n=>({name:n, lives:settings.pp.lives, falls:0, out:false})),
+      per:settings.pp.per, seq:[], added:[], turn:0, phase:"start", winner:null, hist:[]};
+  activeGame="pp"; unlockAudio(); keepAwake(true);
+  $("pp-setup").hidden=true; $("pp-run").hidden=false; $("game-seg").hidden=true;
+  ppRender();
+}
+function ppSave(){ const {hist, ...rest}=pp; pp.hist.push(JSON.stringify(rest)); if(pp.hist.length>60) pp.hist.shift(); }
+function ppWall(){ if(pp) sendHolds(pp.seq); }
+function ppRetype(){
+  // holds added this turn are blue; once all are marked, the last one is the match (yellow)
+  pp.added.forEach((h,k)=>{ const s=pp.seq.find(x=>x.h===h); if(s) s.t = (k===pp.per-1) ? "M" : "B"; });
+}
+function ppTap(i){
+  if(!pp || (pp.phase!=="start" && pp.phase!=="add")) return;
+  const inSeq = pp.seq.findIndex(s=>s.h===i);
+  if(pp.phase==="start"){
+    ppSave();
+    if(inSeq>=0) pp.seq.splice(inSeq,1);
+    else if(pp.seq.length>=2){ pp.hist.pop(); return toast("Massimo 2 prese di partenza"); }
+    else pp.seq.push({h:i,t:"S"});
+  }else{
+    const k=pp.added.indexOf(i);
+    if(k>=0){ ppSave(); pp.added.splice(k,1); pp.seq.splice(inSeq,1); }
+    else if(inSeq>=0) return toast("Questa presa è già nel percorso");
+    else if(pp.added.length>=pp.per) return toast("Prese già segnate: toccane una per toglierla");
+    else { ppSave(); pp.added.push(i); pp.seq.push({h:i,t:"B"}); }
+    ppRetype();
+  }
+  if(navigator.vibrate) navigator.vibrate(10);
+  ppRender();
+}
+function ppNextAlive(from){
+  const n=pp.players.length;
+  for(let k=1;k<=n;k++){ const j=(from+k)%n; if(!pp.players[j].out) return j; }
+  return from;
+}
+function ppAction(kind){
+  ppSave();
+  const p=pp.players[pp.turn];
+  if(kind==="startdone"){ pp.phase="add"; pp.added=[]; }
+  else if(kind==="turndone"){ pp.turn=ppNextAlive(pp.turn); pp.phase="climb"; pp.added=[]; beep(660,.25); }
+  else if(kind==="top"){ pp.phase="add"; pp.added=[]; beep(880,.2); }
+  else if(kind==="fall"){
+    p.falls++;
+    if(p.lives>0){ p.lives--; if(p.lives===0){ p.out=true; toast(p.name+" è fuori!"); } }
+    const alive=pp.players.filter(x=>!x.out);
+    if(alive.length===0 || (pp.players.length>1 && alive.length===1)){
+      pp.phase="over"; pp.winner = alive.length===1 ? alive[0].name : null;
+      beep(880,.15); setTimeout(()=>beep(1180,.3),180);
+    }else{ pp.turn=ppNextAlive(pp.turn); pp.phase="climb"; beep(330,.3); }
+  }
+  ppRender();
+}
+function ppRender(){
+  const p=pp.players[pp.turn], A=$("pp-actions"); A.innerHTML="";
+  const holds=pp.seq.filter(s=>s.t!=="S").length;
+  const btn=(txt, cls, fn, dis)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=txt; if(cls) b.className=cls; b.disabled=!!dis; b.onclick=fn; return b; };
+  if(pp.phase==="start"){
+    $("pp-status").textContent=p.name+" sceglie lo start";
+    $("pp-instr").textContent="Tocca 1 o 2 prese di partenza (verdi), poi premi Avanti.";
+    A.appendChild(btn("Avanti: segna le prese", "next", ()=>ppAction("startdone"), !pp.seq.length));
+  }else if(pp.phase==="add"){
+    const left=pp.per-pp.added.length;
+    $("pp-status").textContent=p.name+" aggiunge "+pp.per+(pp.per===1?" presa":" prese");
+    $("pp-instr").textContent = left>0
+      ? "Tocca le prese man mano che le chiama ("+left+" da segnare). L'ultima diventa gialla: va accoppiata. Ritocca una presa per toglierla."
+      : "Fatto! Se è tutto giusto, passa il turno.";
+    const nx=pp.players[ppNextAlive(pp.turn)];
+    A.appendChild(btn(pp.players.length>1 ? "Fatto: tocca a "+nx.name : "Fatto: ripeti il percorso", "next", ()=>ppAction("turndone"), left>0));
+  }else if(pp.phase==="climb"){
+    $("pp-status").textContent=p.name+" ripete il percorso";
+    $("pp-instr").textContent=holds+" prese dopo lo start. Se arriva in fondo, aggiunge le sue "+pp.per+".";
+    const g=document.createElement("div"); g.className="big2";
+    g.append(btn("Arrivato ✔","ok",()=>ppAction("top")), btn("Caduto ✗","ko",()=>ppAction("fall")));
+    A.appendChild(g);
+  }else{
+    $("pp-status").textContent = pp.winner ? "🏆 Vince "+pp.winner+"!" : "Partita finita";
+    $("pp-instr").textContent="Percorso finale: "+holds+" prese dopo lo start.";
+    A.appendChild(btn("Nuova partita","next",ppStop));
+  }
+  // scoreboard
+  const sc=$("pp-score"); sc.innerHTML="";
+  pp.players.forEach((x,k)=>{
+    const ch=document.createElement("span");
+    ch.className="pchip"+(k===pp.turn && pp.phase!=="over"?" cur":"")+(x.out?" out":"");
+    ch.append(x.name);
+    const sm=document.createElement("small");
+    sm.textContent = settings.pp.lives ? "❤️".repeat(Math.max(0,x.lives)) || "fuori" : (x.falls ? "✗ "+x.falls : "");
+    ch.appendChild(sm); sc.appendChild(ch);
+  });
+  // board: order numbers after the start, newest holds of this turn pop
+  let n=0;
+  paint(ppCells, pp.seq.map(s=>({h:s.h, t:s.t, label: s.t==="S" ? "S" : String(++n), newest: pp.added.includes(s.h)})), true);
+  $("pp-undo").disabled = !pp.hist.length || pp.phase==="over";
+  ppWall();
+}
+function ppStop(){
+  pp=null; activeGame=null; lightsOff(); keepAwake(false); stopSilent();
+  paint(ppCells, [], true);
+  $("pp-run").hidden=true; $("pp-setup").hidden=false; $("game-seg").hidden=false;
+  renderPPSetup();
+}
+$("pp-start").onclick=ppStart;
+$("pp-undo").onclick=()=>{ if(!pp || !pp.hist.length) return; const h=pp.hist; Object.assign(pp, JSON.parse(h.pop())); pp.hist=h; ppRender(); };
+$("pp-end").onclick=e=>confirmTap(e.currentTarget, ppStop);
+
+document.querySelectorAll("#game-seg button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#game-seg button").forEach(x=>x.setAttribute("aria-pressed", x===b));
+  $("x4-setup").hidden = b.dataset.g!=="x4";
+  $("pp-setup").hidden = b.dataset.g!=="pp";
+});
+
 /* ---------- navigation ---------- */
 function show(v){
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("active", s.id==="view-"+v));
@@ -660,7 +1104,7 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.
 (()=>{ const G=$("cgrade"); const o=document.createElement("option"); o.value=""; o.textContent="—"; G.appendChild(o);
   GRADES.forEach(g=>{ const x=document.createElement("option"); x.value=g; x.textContent=g; G.appendChild(x); }); })();
 $("cname").addEventListener("input", e=>e.target.classList.remove("missing"));
-renderEditor(); renderList(); renderSettings();
+renderEditor(); renderList(); renderSettings(); renderX4Setup(); renderPPSetup();
 })();
 </script>
 </body>
