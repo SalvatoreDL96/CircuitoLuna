@@ -136,7 +136,7 @@ nav button[aria-current="page"]{color:var(--ink)}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .badge{font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:8px;vertical-align:3px}
 .big2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.big2 button{padding:22px 8px;font-family:var(--display);font-size:26px;font-weight:700;border-radius:14px;border:0;color:#fff}
+.big2 button{padding:20px 8px;font-family:var(--display);font-size:24px;line-height:1.1;font-weight:700;border-radius:14px;border:0;color:#fff}
 .big2 .ok{background:var(--green)}.big2 .ko{background:var(--red)}
 .big2 button:disabled,.next:disabled{opacity:.4}
 .players{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
@@ -159,9 +159,40 @@ table.sum{width:100%;border-collapse:collapse;margin-top:12px;background:var(--s
 table.sum th,table.sum td{padding:9px 6px;text-align:center;border-bottom:1px solid var(--line);font-size:15px}
 table.sum th:first-child,table.sum td:first-child{text-align:left;padding-left:12px}
 table.sum .y{color:var(--green);font-weight:700}table.sum .n{color:var(--red);font-weight:700}
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--accent);color:var(--on-accent);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%;text-align:center}
+/* wall photo behind the grids */
+.board{position:relative;overflow:hidden}
+.board > .cell, .board > .lab{position:relative;z-index:1}
+.photo-layer{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.photo-layer img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;user-select:none;-webkit-user-select:none}
+.board.photo{background:#0d0f14}
+.board.photo .cell::before{background:#fff;opacity:.35;width:12%;height:12%}
+.board.photo .lab{color:#fff;opacity:1;text-shadow:0 1px 2px #000,0 0 3px #000}
+.board.photo .cell.on b{background:transparent!important;color:#fff!important;inset:-6%;border:3px solid var(--c);
+  box-shadow:0 0 0 1.5px rgba(0,0,0,.75),inset 0 0 0 1.5px rgba(0,0,0,.6);
+  align-items:flex-start;justify-content:flex-end;font-size:12px;line-height:1;padding:1px 2px 0 0;text-shadow:0 0 3px #000,0 0 3px #000,0 0 2px #000}
+.board.photo .cell.lit b{box-shadow:0 0 0 1.5px rgba(0,0,0,.75),inset 0 0 0 1.5px rgba(0,0,0,.6),0 0 10px 2px var(--c)}
+.phototool{display:flex;gap:8px;align-items:center;margin:8px 0 0}
+.phototool .btn{padding:8px 12px;font-size:14px}
+/* alignment sheet */
+.sheet .card.tall{max-height:94vh;overflow:auto;border-radius:16px 16px 0 0}
+.alignbox{position:relative;margin:10px 0;border-radius:10px;overflow:hidden;background:#111;touch-action:none;user-select:none;-webkit-user-select:none}
+.alignbox img{display:block;width:100%;height:auto;pointer-events:none}
+.alignbox svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mk{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.6);touch-action:none;cursor:grab;background:rgba(0,0,0,.15)}
+.mk::before,.mk::after{content:"";position:absolute;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+.mk::before{left:50%;top:6px;bottom:6px;width:2px;margin-left:-1px}
+.mk::after{top:50%;left:6px;right:6px;height:2px;margin-top:-1px}
+.mk span{position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--on-accent);font-family:var(--display);font-weight:700;font-size:14px;padding:0 6px;border-radius:5px;white-space:nowrap}
+.loupe{position:absolute;top:8px;right:8px;width:130px;height:130px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.5);background-repeat:no-repeat;background-color:#000;pointer-events:none;z-index:3}
+.loupe.left{right:auto;left:8px}
+.loupe::before,.loupe::after{content:"";position:absolute;background:#ff3b30}
+.loupe::before{left:50%;top:30%;bottom:30%;width:2px;margin-left:-1px}
+.loupe::after{top:50%;left:30%;right:30%;height:2px;margin-top:-1px}
+.switchrow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.switchrow input{width:22px;height:22px}
+.toast{position:fixed;z-index:70;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--accent);color:var(--on-accent);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%;text-align:center}
 .toast.show{opacity:1}
-.sheet{position:fixed;inset:0;background:rgba(10,14,22,.55);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{position:fixed;inset:0;background:rgba(10,14,22,.55);display:none;align-items:flex-end;justify-content:center;z-index:60}
 .sheet.show{display:flex}
 .sheet .card{background:var(--surface);border-radius:16px 16px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));max-width:560px;width:100%}
 .sheet h3{font-family:var(--display);font-size:24px;margin:0 0 8px}
@@ -193,6 +224,10 @@ table.sum .y{color:var(--green);font-weight:700}table.sum .n{color:var(--red);fo
       </div>
     </div>
     <div class="board" id="board-edit"></div>
+    <div class="phototool">
+      <button class="btn" id="photo-open" type="button">📷 Foto parete</button>
+      <button class="btn" id="photo-toggle" type="button" hidden></button>
+    </div>
     <div class="steps" id="steps"></div>
     <div class="row">
       <button class="btn grow" id="undo" type="button">↩︎ Indietro</button>
@@ -344,6 +379,25 @@ table.sum .y{color:var(--green);font-weight:700}table.sum .n{color:var(--red);fo
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="sheet" id="photo-sheet">
+  <div class="card tall">
+    <h3>Foto della parete</h3>
+    <p class="hint" id="ph-intro">Fai una foto alla Moonboard ben di fronte, con tutta la parete dentro. Poi trascina i 4 mirini sui fori (o sui LED) degli angoli: A18 in alto a sinistra, K18 in alto a destra, K1 in basso a destra, A1 in basso a sinistra.</p>
+    <label class="btn" style="display:inline-block;cursor:pointer">📁 Scegli foto<input type="file" id="ph-file" accept="image/*" hidden></label>
+    <div class="alignbox" id="ph-box" hidden>
+      <img id="ph-img" alt="Foto della parete">
+      <svg id="ph-svg" aria-hidden="true"></svg>
+      <div class="loupe" id="ph-loupe" hidden></div>
+    </div>
+    <div class="switchrow" id="ph-showrow" hidden><label for="ph-show">Mostra la foto sotto le griglie</label><input type="checkbox" id="ph-show"></div>
+    <div class="row">
+      <button class="btn danger" id="ph-remove" type="button" hidden>Rimuovi foto</button>
+      <button class="btn grow" id="ph-cancel" type="button">Chiudi</button>
+      <button class="btn primary grow" id="ph-save" type="button" hidden>Salva allineamento</button>
+    </div>
+  </div>
+</div>
 
 <div class="sheet" id="help">
   <div class="card">
@@ -1033,16 +1087,17 @@ function ppAction(kind){
   ppSave();
   const p=pp.players[pp.turn];
   if(kind==="startdone"){ pp.phase="add"; pp.added=[]; }
-  else if(kind==="turndone"){ pp.turn=ppNextAlive(pp.turn); pp.phase="climb"; pp.added=[]; beep(660,.25); }
-  else if(kind==="top"){ pp.phase="add"; pp.added=[]; beep(880,.2); }
+  else if(kind==="turndone"){ pp.turn=ppNextAlive(pp.turn); pp.phase="add"; pp.added=[]; beep(660,.25); }
   else if(kind==="fall"){
+    // holds marked during a turn that ends in a fall are not kept
+    pp.seq = pp.seq.filter(s=>!pp.added.includes(s.h)); pp.added=[];
     p.falls++;
     if(p.lives>0){ p.lives--; if(p.lives===0){ p.out=true; toast(p.name+" è fuori!"); } }
     const alive=pp.players.filter(x=>!x.out);
     if(alive.length===0 || (pp.players.length>1 && alive.length===1)){
       pp.phase="over"; pp.winner = alive.length===1 ? alive[0].name : null;
       beep(880,.15); setTimeout(()=>beep(1180,.3),180);
-    }else{ pp.turn=ppNextAlive(pp.turn); pp.phase="climb"; beep(330,.3); }
+    }else{ pp.turn=ppNextAlive(pp.turn); pp.phase="add"; beep(330,.3); }
   }
   ppRender();
 }
@@ -1053,20 +1108,19 @@ function ppRender(){
   if(pp.phase==="start"){
     $("pp-status").textContent=p.name+" sceglie lo start";
     $("pp-instr").textContent="Tocca 1 o 2 prese di partenza (verdi), poi premi Avanti.";
-    A.appendChild(btn("Avanti: segna le prese", "next", ()=>ppAction("startdone"), !pp.seq.length));
+    A.appendChild(btn("Avanti: le prime prese", "next", ()=>ppAction("startdone"), !pp.seq.length));
   }else if(pp.phase==="add"){
-    const left=pp.per-pp.added.length;
-    $("pp-status").textContent=p.name+" aggiunge "+pp.per+(pp.per===1?" presa":" prese");
+    const left=pp.per-pp.added.length, nw=pp.per+(pp.per===1?" presa nuova":" prese nuove"), nwShort=pp.per+(pp.per===1?" nuova":" nuove");
+    const prev = holds - pp.added.length;
+    $("pp-status").textContent = prev>0 ? p.name+" è sul percorso" : p.name+" aggiunge "+nw;
     $("pp-instr").textContent = left>0
-      ? "Tocca le prese man mano che le chiama ("+left+" da segnare). L'ultima diventa gialla: va accoppiata. Ritocca una presa per toglierla."
-      : "Fatto! Se è tutto giusto, passa il turno.";
+      ? (prev>0 ? "Ripete le "+prev+" prese, poi ne prende "+nwShort+". " : "")
+        + "Segna ogni presa nuova solo dopo che l'ha presa ("+left+" da segnare); l'ultima diventa gialla e va accoppiata. Se cade prima, premi Caduto."
+      : "Prese segnate! Se ha accoppiato l'ultima senza cadere, premi Fatto. Ritocca una presa per toglierla.";
     const nx=pp.players[ppNextAlive(pp.turn)];
-    A.appendChild(btn(pp.players.length>1 ? "Fatto: tocca a "+nx.name : "Fatto: ripeti il percorso", "next", ()=>ppAction("turndone"), left>0));
-  }else if(pp.phase==="climb"){
-    $("pp-status").textContent=p.name+" ripete il percorso";
-    $("pp-instr").textContent=holds+" prese dopo lo start. Se arriva in fondo, aggiunge le sue "+pp.per+".";
     const g=document.createElement("div"); g.className="big2";
-    g.append(btn("Arrivato ✔","ok",()=>ppAction("top")), btn("Caduto ✗","ko",()=>ppAction("fall")));
+    g.append(btn(pp.players.length>1 ? "Fatto ✔ tocca a "+nx.name : "Fatto ✔","ok",()=>ppAction("turndone"), left>0),
+             btn("Caduto ✗","ko",()=>ppAction("fall")));
     A.appendChild(g);
   }else{
     $("pp-status").textContent = pp.winner ? "🏆 Vince "+pp.winner+"!" : "Partita finita";
@@ -1105,11 +1159,167 @@ document.querySelectorAll("#game-seg button").forEach(b=>b.onclick=()=>{
   $("pp-setup").hidden = b.dataset.g!=="pp";
 });
 
+/* ---------- FOTO DELLA PARETE ---------- */
+// The photo is stored downscaled in this browser, with the 4 corner points (A18, K18, K1, A1)
+// as fractions of the photo's width/height. A perspective transform (homography) maps it onto each grid.
+const CORNERS = [{c:0,r:ROWS,n:"A18"},{c:10,r:ROWS,n:"K18"},{c:10,r:1,n:"K1"},{c:0,r:1,n:"A1"}];
+let photo = load("mbc_photo", null);          // {src, w, h, pts:[[x,y]...], show}
+const boards = [];                              // {el, cells}
+function registerBoard(el, cells){
+  const layer=document.createElement("div"); layer.className="photo-layer";
+  const img=document.createElement("img"); img.alt=""; img.draggable=false; layer.appendChild(img);
+  el.insertBefore(layer, el.firstChild);
+  const bd={el, cells, img};
+  boards.push(bd);
+  if(window.ResizeObserver) new ResizeObserver(()=>placePhoto(bd)).observe(el);
+}
+// Solve the 8 unknowns of the homography that maps the 4 src points onto the 4 dst points
+function homography(src, dst){
+  const A=[], B=[];
+  for(let i=0;i<4;i++){
+    const [x,y]=src[i], [u,v]=dst[i];
+    A.push([x,y,1,0,0,0,-u*x,-u*y]); B.push(u);
+    A.push([0,0,0,x,y,1,-v*x,-v*y]); B.push(v);
+  }
+  for(let c=0;c<8;c++){                       // Gaussian elimination with pivoting
+    let m=c; for(let r=c+1;r<8;r++) if(Math.abs(A[r][c])>Math.abs(A[m][c])) m=r;
+    [A[c],A[m]]=[A[m],A[c]]; [B[c],B[m]]=[B[m],B[c]];
+    if(Math.abs(A[c][c])<1e-12) return null;
+    for(let r=0;r<8;r++){ if(r===c) continue; const f=A[r][c]/A[c][c]; for(let k=c;k<8;k++) A[r][k]-=f*A[c][k]; B[r]-=f*B[c]; }
+  }
+  return B.map((b,i)=>b/A[i][i]);
+}
+function placePhoto(bd){
+  const on = !!(photo && photo.show && photo.src);
+  bd.el.classList.toggle("photo", on);
+  bd.img.style.display = on ? "" : "none";
+  if(!on) return;
+  if(bd.img.getAttribute("src")!==photo.src) bd.img.src=photo.src;
+  const dst = CORNERS.map(k=>{ const b=bd.cells[idxOf(k.c,k.r)]; return [b.offsetLeft+b.offsetWidth/2, b.offsetTop+b.offsetHeight/2]; });
+  if(!dst[1][0]) return;                       // board not visible yet: the observer calls again when it is
+  const src = photo.pts.map(([x,y])=>[x*photo.w, y*photo.h]);
+  const h = homography(src, dst); if(!h) return;
+  bd.img.style.width=photo.w+"px"; bd.img.style.height=photo.h+"px";
+  bd.img.style.transform="matrix3d("+[h[0],h[3],0,h[6], h[1],h[4],0,h[7], 0,0,1,0, h[2],h[5],0,1].join(",")+")";
+}
+const placeAll = () => boards.forEach(placePhoto);
+window.addEventListener("resize", ()=>requestAnimationFrame(placeAll));
+registerBoard($("board-edit"), editCells);
+registerBoard($("board-live"), liveCells);
+registerBoard($("board-x4"), x4Cells);
+registerBoard($("board-pp"), ppCells);
+
+function renderPhotoTool(){
+  const t=$("photo-toggle");
+  t.hidden = !(photo && photo.src);
+  if(photo) t.textContent = photo.show ? "🙈 Nascondi foto" : "👁️ Mostra foto";
+}
+$("photo-toggle").onclick=()=>{ if(!photo) return; photo.show=!photo.show; savePhoto(); placeAll(); renderPhotoTool(); };
+function savePhoto(){
+  try{ localStorage.setItem("mbc_photo", JSON.stringify(photo)); return true; }
+  catch(e){ toast("Foto troppo grande da salvare: provane una più piccola"); return false; }
+}
+
+// --- alignment sheet ---
+let draft=null, dragK=-1;
+function openPhotoSheet(){
+  draft = photo ? JSON.parse(JSON.stringify(photo)) : null;
+  renderSheet();
+  $("photo-sheet").classList.add("show");
+}
+function renderSheet(){
+  const has=!!(draft && draft.src);
+  $("ph-box").hidden=!has; $("ph-save").hidden=!has; $("ph-showrow").hidden=!has;
+  $("ph-remove").hidden=!(photo && photo.src);
+  if(!has) return;
+  const img=$("ph-img"); if(img.getAttribute("src")!==draft.src) img.src=draft.src;
+  $("ph-show").checked = draft.show!==false;
+  const box=$("ph-box");
+  box.querySelectorAll(".mk").forEach(m=>m.remove());
+  draft.pts.forEach((pt,k)=>{
+    const m=document.createElement("div"); m.className="mk"; m.dataset.k=k;
+    const lab=document.createElement("span"); lab.textContent=CORNERS[k].n; m.appendChild(lab);
+    m.style.left=(pt[0]*100)+"%"; m.style.top=(pt[1]*100)+"%";
+    m.addEventListener("pointerdown", e=>{ e.preventDefault(); dragK=k; m.setPointerCapture(e.pointerId); moveMarker(e); });
+    m.addEventListener("pointermove", e=>{ if(dragK===k) moveMarker(e); });
+    const end=()=>{ dragK=-1; $("ph-loupe").hidden=true; };
+    m.addEventListener("pointerup", end); m.addEventListener("pointercancel", end);
+    box.appendChild(m);
+  });
+  drawOutline();
+}
+function moveMarker(e){
+  const box=$("ph-box"), r=box.getBoundingClientRect();
+  const x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)), y=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));
+  draft.pts[dragK]=[x,y];
+  const m=box.querySelector('.mk[data-k="'+dragK+'"]'); m.style.left=(x*100)+"%"; m.style.top=(y*100)+"%";
+  // magnifier: 3x around the finger, on the side away from it
+  const L=$("ph-loupe"), Z=3, S=130;
+  L.hidden=false; L.classList.toggle("left", x>0.5);
+  L.style.backgroundImage="url("+draft.src+")";
+  L.style.backgroundSize=(r.width*Z)+"px "+(r.height*Z)+"px";
+  L.style.backgroundPosition=(S/2-x*r.width*Z)+"px "+(S/2-y*r.height*Z)+"px";
+  drawOutline();
+}
+function drawOutline(){
+  // outline of the wall plus the grid lines, computed with the same perspective as the real overlay
+  const svg=$("ph-svg"), box=$("ph-box"), W=box.clientWidth, H=box.clientHeight;
+  if(!W) return;
+  svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  const corners=draft.pts.map(([x,y])=>[x*W,y*H]);
+  // map grid coordinates (col 0..10, row 0..17 from top) to photo pixels
+  const h=homography([[0,0],[10,0],[10,17],[0,17]], corners);
+  if(!h){ svg.innerHTML=""; return; }
+  const P=(c,r)=>{ const w=h[6]*c+h[7]*r+1; return [(h[0]*c+h[1]*r+h[2])/w, (h[3]*c+h[4]*r+h[5])/w]; };
+  let d="";
+  for(let c=0;c<=10;c++){ const a=P(c,0), b=P(c,17); d+="M"+a[0]+" "+a[1]+"L"+b[0]+" "+b[1]; }
+  for(let r=0;r<=17;r++){ const a=P(0,r), b=P(10,r); d+="M"+a[0]+" "+a[1]+"L"+b[0]+" "+b[1]; }
+  let dots="";
+  for(let c=0;c<=10;c++) for(let r=0;r<=17;r++){ const q=P(c,r); dots+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="2.2"/>'; }
+  svg.innerHTML='<path d="'+d+'" stroke="rgba(255,255,255,.35)" stroke-width="1" fill="none"/>'+
+                '<g fill="#ffd60a" stroke="rgba(0,0,0,.6)" stroke-width=".8">'+dots+'</g>';
+}
+window.addEventListener("resize", ()=>{ if($("photo-sheet").classList.contains("show") && draft) drawOutline(); });
+$("ph-img").addEventListener("load", ()=>drawOutline());
+$("ph-file").addEventListener("change", e=>{
+  const f=e.target.files && e.target.files[0]; if(!f) return;
+  const url=URL.createObjectURL(f), im=new Image();
+  im.onload=()=>{
+    // shrink to at most 1400 px so it fits in the browser's storage
+    const k=Math.min(1, 1400/Math.max(im.naturalWidth, im.naturalHeight));
+    const w=Math.round(im.naturalWidth*k), h=Math.round(im.naturalHeight*k);
+    const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+    cv.getContext("2d").drawImage(im,0,0,w,h);
+    URL.revokeObjectURL(url);
+    const keep = draft && draft.pts;
+    draft={src:cv.toDataURL("image/jpeg",0.8), w, h, show:true,
+           pts: keep ? draft.pts : [[0.15,0.1],[0.85,0.1],[0.85,0.9],[0.15,0.9]]};
+    renderSheet();
+  };
+  im.onerror=()=>toast("Non riesco ad aprire questa foto");
+  im.src=url; e.target.value="";
+});
+$("ph-show").onchange=e=>{ if(draft) draft.show=e.target.checked; };
+$("ph-save").onclick=()=>{
+  const prev=photo; photo=draft;
+  if(!savePhoto()){ photo=prev; return; }
+  $("photo-sheet").classList.remove("show"); placeAll(); renderPhotoTool();
+  toast(photo.show ? "Foto allineata 📷" : "Foto salvata (nascosta)");
+};
+$("ph-cancel").onclick=()=>$("photo-sheet").classList.remove("show");
+$("ph-remove").onclick=e=>confirmTap(e.currentTarget, ()=>{
+  photo=null; draft=null; try{ localStorage.removeItem("mbc_photo"); }catch(x){}
+  placeAll(); renderPhotoTool(); renderSheet(); toast("Foto rimossa");
+});
+$("photo-open").onclick=openPhotoSheet;
+renderPhotoTool();
+
 /* ---------- navigation ---------- */
 function show(v){
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("active", s.id==="view-"+v));
   document.querySelectorAll("nav button").forEach(b=> b.dataset.view===v ? b.setAttribute("aria-current","page") : b.removeAttribute("aria-current"));
   window.scrollTo(0,0);
+  requestAnimationFrame(placeAll);
 }
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.view));
 
