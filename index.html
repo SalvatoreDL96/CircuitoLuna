@@ -225,8 +225,8 @@ table.sum .y{color:var(--green);font-weight:700}table.sum .n{color:var(--red);fo
     </div>
     <div class="board" id="board-edit"></div>
     <div class="phototool">
-      <button class="btn" id="photo-open" type="button">📷 Foto parete</button>
-      <button class="btn" id="photo-toggle" type="button" hidden></button>
+      <button class="btn photo-open" id="photo-open" type="button">📷 Foto parete</button>
+      <button class="btn photo-toggle" id="photo-toggle" type="button" hidden></button>
     </div>
     <div class="steps" id="steps"></div>
     <div class="row">
@@ -340,8 +340,10 @@ table.sum .y{color:var(--green);font-weight:700}table.sum .n{color:var(--red);fo
         <input type="text" id="pp-name" placeholder="Nome giocatore" maxlength="16">
         <button class="btn" id="pp-add" type="button">Aggiungi</button>
       </div>
+      <div class="stepper"><span>Prese di start</span><div class="ctrl"><button type="button" id="ppstart-m">−</button><output id="o-ppstart"></output><button type="button" id="ppstart-p">+</button></div></div>
       <div class="stepper"><span>Prese a turno</span><div class="ctrl"><button type="button" id="ppper-m">−</button><output id="o-ppper"></output><button type="button" id="ppper-p">+</button></div></div>
       <div class="stepper"><span>Vite per giocatore</span><div class="ctrl"><button type="button" id="pplives-m">−</button><output id="o-pplives"></output><button type="button" id="pplives-p">+</button></div></div>
+      <div class="phototool" style="margin-bottom:10px"><button class="btn photo-open" type="button">📷 Foto parete</button><button class="btn photo-toggle" type="button" hidden></button></div>
       <button class="btn primary" id="pp-start" type="button" style="width:100%;padding:16px">Inizia la partita</button>
     </div>
 
@@ -353,6 +355,7 @@ table.sum .y{color:var(--green);font-weight:700}table.sum .n{color:var(--red);fo
       <div class="board" id="board-pp"></div>
       <div id="pp-actions"></div>
       <div class="row">
+        <button class="btn photo-toggle" type="button" hidden></button>
         <button class="btn grow" id="pp-undo" type="button">↩︎ Annulla</button>
         <button class="btn grow danger" id="pp-end" type="button">Fine partita</button>
       </div>
@@ -881,7 +884,7 @@ $("back").onclick=()=>{ if(run && run.i>0) showStep(run.i-1); };
 
 /* ---------- GIOCHI: 4x4 ---------- */
 settings.x4 = Object.assign({slots:["","","",""], order:"row", rest:180, gap:0}, settings.x4||{});
-settings.pp = Object.assign({players:["Salvatore","Giocatore 2"], lives:3, per:2}, settings.pp||{});
+settings.pp = Object.assign({players:["Salvatore","Giocatore 2"], lives:3, per:2, starts:1}, settings.pp||{});
 const x4Cells = buildBoard($("board-x4"), null);
 let x4 = null, x4T = null;
 const byId = id => circuits.find(c=>c.id===id);
@@ -1027,6 +1030,7 @@ function renderPPSetup(){
   });
   if(!settings.pp.players.length) box.innerHTML='<span class="instr">Aggiungi almeno un giocatore</span>';
   $("o-ppper").textContent=settings.pp.per;
+  $("o-ppstart").textContent=settings.pp.starts;
   $("o-pplives").textContent=livesTxt(settings.pp.lives);
   store("mbc_settings", settings);
 }
@@ -1038,6 +1042,8 @@ function ppAddPlayer(){
 }
 $("pp-add").onclick=ppAddPlayer;
 $("pp-name").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); ppAddPlayer(); } });
+$("ppstart-m").onclick=()=>{ settings.pp.starts=1; renderPPSetup(); };
+$("ppstart-p").onclick=()=>{ settings.pp.starts=2; renderPPSetup(); };
 $("ppper-m").onclick=()=>{ settings.pp.per=Math.max(1,settings.pp.per-1); renderPPSetup(); };
 $("ppper-p").onclick=()=>{ settings.pp.per=Math.min(4,settings.pp.per+1); renderPPSetup(); };
 // lives: 1..5, then 0 = unlimited
@@ -1048,32 +1054,33 @@ function ppStart(){
   if(run) return toast("Termina prima l'allenamento in corso");
   if(!settings.pp.players.length) return toast("Aggiungi almeno un giocatore");
   pp={players:settings.pp.players.map(n=>({name:n, lives:settings.pp.lives, falls:0, out:false})),
-      per:settings.pp.per, seq:[], added:[], turn:0, phase:"start", winner:null, hist:[]};
+      per:settings.pp.per, starts:settings.pp.starts||1, seq:[], added:[], turn:0, phase:"start", winner:null, hist:[]};
   activeGame="pp"; unlockAudio(); keepAwake(true);
   $("pp-setup").hidden=true; $("pp-run").hidden=false; $("game-seg").hidden=true;
   ppRender();
 }
 function ppSave(){ const {hist, ...rest}=pp; pp.hist.push(JSON.stringify(rest)); if(pp.hist.length>60) pp.hist.shift(); }
 function ppWall(){ if(pp) sendHolds(pp.seq); }
-function ppRetype(){
-  // holds added this turn are blue; once all are marked, the last one is the match (yellow)
-  pp.added.forEach((h,k)=>{ const s=pp.seq.find(x=>x.h===h); if(s) s.t = (k===pp.per-1) ? "M" : "B"; });
-}
+// 2+2 holds: tapping one of this turn's holds again cycles Destra -> Sinistra -> Accoppia -> removed
+const NEXT_PP = {D:"N", N:"T", T:null};
 function ppTap(i){
   if(!pp || (pp.phase!=="start" && pp.phase!=="add")) return;
   const inSeq = pp.seq.findIndex(s=>s.h===i);
   if(pp.phase==="start"){
     ppSave();
     if(inSeq>=0) pp.seq.splice(inSeq,1);
-    else if(pp.seq.length>=2){ pp.hist.pop(); return toast("Massimo 2 prese di partenza"); }
+    else if(pp.seq.length>=pp.starts){ pp.hist.pop(); return toast(pp.starts===1 ? "Lo start è una presa sola: toccala per toglierla" : "Massimo 2 prese di partenza"); }
     else pp.seq.push({h:i,t:"S"});
   }else{
     const k=pp.added.indexOf(i);
-    if(k>=0){ ppSave(); pp.added.splice(k,1); pp.seq.splice(inSeq,1); }
+    if(k>=0){
+      ppSave();
+      const nx=NEXT_PP[pp.seq[inSeq].t];
+      if(nx) pp.seq[inSeq].t=nx; else { pp.added.splice(k,1); pp.seq.splice(inSeq,1); }
+    }
     else if(inSeq>=0) return toast("Questa presa è già nel percorso");
-    else if(pp.added.length>=pp.per) return toast("Prese già segnate: toccane una per toglierla");
-    else { ppSave(); pp.added.push(i); pp.seq.push({h:i,t:"B"}); }
-    ppRetype();
+    else if(pp.added.length>=pp.per) return toast("Prese già segnate: ritocca una presa per cambiarla o toglierla");
+    else { ppSave(); pp.added.push(i); pp.seq.push({h:i,t:"D"}); }
   }
   if(navigator.vibrate) navigator.vibrate(10);
   ppRender();
@@ -1107,16 +1114,16 @@ function ppRender(){
   const btn=(txt, cls, fn, dis)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=txt; if(cls) b.className=cls; b.disabled=!!dis; b.onclick=fn; return b; };
   if(pp.phase==="start"){
     $("pp-status").textContent=p.name+" sceglie lo start";
-    $("pp-instr").textContent="Tocca 1 o 2 prese di partenza (verdi), poi premi Avanti.";
-    A.appendChild(btn("Avanti: le prime prese", "next", ()=>ppAction("startdone"), !pp.seq.length));
+    $("pp-instr").textContent = pp.starts===1 ? "Tocca la presa di partenza (verde), poi premi Avanti." : "Tocca le 2 prese di partenza (verdi), poi premi Avanti.";
+    A.appendChild(btn("Avanti: le prime prese", "next", ()=>ppAction("startdone"), pp.seq.length!==pp.starts));
   }else if(pp.phase==="add"){
     const left=pp.per-pp.added.length, nw=pp.per+(pp.per===1?" presa nuova":" prese nuove"), nwShort=pp.per+(pp.per===1?" nuova":" nuove");
     const prev = holds - pp.added.length;
     $("pp-status").textContent = prev>0 ? p.name+" è sul percorso" : p.name+" aggiunge "+nw;
     $("pp-instr").textContent = left>0
       ? (prev>0 ? "Ripete le "+prev+" prese, poi ne prende "+nwShort+". " : "")
-        + "Segna ogni presa nuova solo dopo che l'ha presa ("+left+" da segnare); l'ultima diventa gialla e va accoppiata. Se cade prima, premi Caduto."
-      : "Prese segnate! Se ha accoppiato l'ultima senza cadere, premi Fatto. Ritocca una presa per toglierla.";
+        + "Segna ogni presa nuova solo dopo che l'ha presa ("+left+" da segnare). Tocca 1 volta: destra (blu), 2: sinistra (gialla), 3: accoppia (rossa), 4: la togli. Se cade prima, premi Caduto."
+      : "Prese segnate! Se non è caduto, premi Fatto. Ritocca una presa per cambiare mano: destra, sinistra, accoppia, via.";
     const nx=pp.players[ppNextAlive(pp.turn)];
     const g=document.createElement("div"); g.className="big2";
     g.append(btn(pp.players.length>1 ? "Fatto ✔ tocca a "+nx.name : "Fatto ✔","ok",()=>ppAction("turndone"), left>0),
@@ -1210,11 +1217,12 @@ registerBoard($("board-x4"), x4Cells);
 registerBoard($("board-pp"), ppCells);
 
 function renderPhotoTool(){
-  const t=$("photo-toggle");
-  t.hidden = !(photo && photo.src);
-  if(photo) t.textContent = photo.show ? "🙈 Nascondi foto" : "👁️ Mostra foto";
+  document.querySelectorAll(".photo-toggle").forEach(t=>{
+    t.hidden = !(photo && photo.src);
+    if(photo) t.textContent = photo.show ? "🙈 Nascondi foto" : "👁️ Mostra foto";
+  });
 }
-$("photo-toggle").onclick=()=>{ if(!photo) return; photo.show=!photo.show; savePhoto(); placeAll(); renderPhotoTool(); };
+document.querySelectorAll(".photo-toggle").forEach(t=>t.onclick=()=>{ if(!photo) return; photo.show=!photo.show; savePhoto(); placeAll(); renderPhotoTool(); });
 function savePhoto(){
   try{ localStorage.setItem("mbc_photo", JSON.stringify(photo)); return true; }
   catch(e){ toast("Foto troppo grande da salvare: provane una più piccola"); return false; }
@@ -1311,7 +1319,7 @@ $("ph-remove").onclick=e=>confirmTap(e.currentTarget, ()=>{
   photo=null; draft=null; try{ localStorage.removeItem("mbc_photo"); }catch(x){}
   placeAll(); renderPhotoTool(); renderSheet(); toast("Foto rimossa");
 });
-$("photo-open").onclick=openPhotoSheet;
+document.querySelectorAll(".photo-open").forEach(b=>b.onclick=openPhotoSheet);
 renderPhotoTool();
 
 /* ---------- navigation ---------- */
